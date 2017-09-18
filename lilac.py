@@ -19,6 +19,17 @@ cmnds_database = [bot_pref+'score_add', bot_pref+'score_del', bot_pref+'score_ge
 
 categories = ['info', 'testing', 'database']
 
+spottedEmojis = [
+	'<:SpottedOrange:342831895257808908>', 
+	'<:SpottedRed:342831895140237312>', 
+	'<:SpottedGreen:342831896574558208>', 
+	'<:SpottedGreen:342831896574558208>', 
+	'<:SpottedBlue:342831896725815296>', 
+	'<:SpottedIndigo:342832174455586828>', 
+	'<:SpottedYellow:342831895978967040>', 
+	'<:SpottedPurple:342832217271173121>'
+]
+
 help_info = {
 	bot_pref+'help': bot_pref+'help [category] [command]\nGets a help topic on [command] in [category].',
 	bot_pref+'categories': bot_pref+'categories\nLists the current command categories.',
@@ -47,6 +58,15 @@ def create_role_dict():
 
 	print('Roles:')
 	print(role_dict)
+
+def create_emoji_dict():
+	global emoji_dict
+	emoji_dict = {}
+	for i in client.get_server('342825738350886913').emojis:
+		emoji_dict[i.name] = i
+
+	print('Roles:')
+	print(emoji_dict)
 
 def get_role(server_roles, target_name):
 	for each in server_roles:
@@ -91,11 +111,14 @@ def on_ready():
 	print('Logged in as')
 	print(client.user)
 	create_role_dict()
+	create_emoji_dict()
 
 @client.event
 @asyncio.coroutine
 def on_message(message):
 	developer = message.server.get_member_named('Alphys Hedge#1031')
+	# comment this out to toggle logging
+	# print(message.content)
 
 	# So the bot won't respond to itself
 	if message.author == client.user:
@@ -108,6 +131,8 @@ def on_message(message):
 
 	# Category: Roles
 	if message.content.startswith(bot_pref+'color'):
+		role = discord.utils.get(message.server.roles, name='[col] blue')
+		print(role)
 		msg_split = (message.content.split())
 		if message.content.endswith('--list'):
 			embed=discord.Embed(title="Color Role List", description="All self-assignable color roles.", color=0xff00ff)
@@ -124,11 +149,27 @@ def on_message(message):
 			yield from client.send_message(message.channel, embed=embed)
 
 		elif message.content.endswith('--changeto'):
-			col = qCheck(msg_split)
-			client.add_roles(message.author, role_dict[col])
+			col = msg_split[1]
+			print('LINE 130 log:: col')
+			print(col)
+			print('LINE 133 log:: role_dict[col]')
+			print(role_dict[col])
+			print(role_dict['colpink'])
+			discord.Client.add_roles(message.author, role_dict[col])
+			print(message.author.roles)
 			for i in message.author.roles:
+				print(i)
 				if i.name.startswith('[col]'):
-					client.remove_roles(message.author, i)
+					# A (FAILED)
+					# client.remove_roles(message.author, role_dict[i])
+					# print(role_dict[i])						
+					# B (FAILED)
+					client.remove_roles(message.author, role_dict[str(i)])
+					print(role_dict[str(i)])
+					# C (FAILED)
+					# client.remove_roles(message.author, i)
+					# print('LINE 147 log:: i')
+					print(i)
 
 	# Category: Database Handling
 	if message.content.startswith(bot_pref+'score_add'):
@@ -217,6 +258,11 @@ def on_message(message):
 		u = qCheck(msg_split)
 		db.user_register(u)
 		yield from client.send_message(message.channel, u+' has been added into the scoreboard database.')
+
+	# Category: Misc
+	if message.content in spottedEmojis:
+		yield from client.send_message(message.channel, role_dict['scorekeeper'].mention)
+		yield from client.send_message(message.channel, 'A new spotted doggo!')
 
 	# Category: Info
 	if message.content.startswith(bot_pref+'commands'):
