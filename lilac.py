@@ -11,7 +11,7 @@ from CONF_bot import token
 client = discord.Client()
 
 bot_pref = '&&'
-bot_version = '1.0.2'
+bot_version = '1.0.4'
 
 cmnds_info = [bot_pref+'commands', bot_pref+'help', bot_pref+'version', bot_pref+'developer']
 cmnds_testing = [bot_pref+'bugreport', bot_pref+'hello', bot_pref+'args']
