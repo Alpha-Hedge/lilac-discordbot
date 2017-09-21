@@ -11,7 +11,7 @@ from CONF_bot import token
 client = discord.Client()
 
 bot_pref = '&&'
-bot_version = '1.0.4'
+bot_version = '1.0.5'
 
 cmnds_info = [bot_pref+'commands', bot_pref+'help', bot_pref+'version', bot_pref+'developer']
 cmnds_testing = [bot_pref+'bugreport', bot_pref+'hello', bot_pref+'args']
@@ -138,7 +138,7 @@ def on_message(message):
 			embed=discord.Embed(title="Color Role List", description="All self-assignable color roles.", color=0xff00ff)
 			embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
 			for i in role_dict:
-				if i.startswith('[col]'):
+				if i.startswith('col.'):
 					print(i)
 					r = str(role_dict[i].color.r)
 					g = str(role_dict[i].color.g)
@@ -148,28 +148,28 @@ def on_message(message):
 
 			yield from client.send_message(message.channel, embed=embed)
 
-		elif message.content.endswith('--changeto'):
-			col = msg_split[1]
-			print('LINE 130 log:: col')
-			print(col)
-			print('LINE 133 log:: role_dict[col]')
-			print(role_dict[col])
-			print(role_dict['colpink'])
-			discord.Client.add_roles(message.author, role_dict[col])
-			print(message.author.roles)
-			for i in message.author.roles:
-				print(i)
-				if i.name.startswith('[col]'):
-					# A (FAILED)
-					# client.remove_roles(message.author, role_dict[i])
-					# print(role_dict[i])						
-					# B (FAILED)
-					client.remove_roles(message.author, role_dict[str(i)])
-					print(role_dict[str(i)])
-					# C (FAILED)
-					# client.remove_roles(message.author, i)
-					# print('LINE 147 log:: i')
-					print(i)
+		# elif message.content.endswith('--changeto'):
+		# 	col = msg_split[1]
+		# 	print('LINE 130 log:: col')
+		# 	print(col)
+		# 	print('LINE 133 log:: role_dict[col]')
+		# 	print(role_dict[col])
+		# 	print(role_dict['colpink'])
+		# 	discord.Client.add_roles(message.author, role_dict[col])
+		# 	print(message.author.roles)
+		# 	for i in message.author.roles:
+		# 		print(i)
+		# 		if i.name.startswith('[col]'):
+		# 			# A (FAILED)
+		# 			# client.remove_roles(message.author, role_dict[i])
+		# 			# print(role_dict[i])						
+		# 			# B (FAILED)
+		# 			client.remove_roles(message.author, role_dict[str(i)])
+		# 			print(role_dict[str(i)])
+		# 			# C (FAILED)
+		# 			# client.remove_roles(message.author, i)
+		# 			# print('LINE 147 log:: i')
+		# 			print(i)
 
 	# Category: Database Handling
 	if message.content.startswith(bot_pref+'score_add'):
@@ -263,6 +263,34 @@ def on_message(message):
 	if message.content in spottedEmojis:
 		yield from client.send_message(message.channel, role_dict['scorekeeper'].mention)
 		yield from client.send_message(message.channel, 'A new spotted doggo!')
+
+	# Category: Misc; Sub-Category: Jokes/Memes
+	# Category: Misc; Sub-Category: Jokes/Memes; Sub-Category: Videos
+	if message.content.startswith('&&video'):
+		if message.content.endswith('ascend'):
+			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=vGyHXW0lwZY')
+		if message.content.endswith('inthewoods'):
+			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=E3Pv4c4Qz9w')
+		if message.content.endswith('masterpiece'):
+			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=NhBktFVTjf8')
+		if message.content.endswith('knifetentacle'):
+			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=qwqP95Am2mA')
+		if message.content.endswith('smoothgamecube'):
+			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=VlmDPC6ai4Y')
+		if message.content.endswith('itiswednesday'):
+			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=du-TY1GUFGk')
+		if message.content.endswith('dabonem'):
+			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=PVHxztbT71o')
+	
+	# Category: Misc; Sub-Category: Jokes/Memes; Sub-Category: Images
+	if message.content.startswith('&&image'):
+		if message.content.endswith('praisebagman'):
+			yield from client.send_message(message.channel, 'https://cdn.discordapp.com/attachments/342835715236954115/346359947908612096/bagmanHOLY.png')
+		if message.content.endswith('wheezd'):
+			yield from client.send_message(message.channel, 'https://cdn.discordapp.com/attachments/301185018057719809/353962163515162625/youvebeenwheezd.png')
+
+	if message.content.startswith('i would like to purchase bamboozle insurance'):
+		yield from client.send_message(message.channel, 'https://i.redd.it/e8rf2wd4zvxy.png')
 
 	# Category: Info
 	if message.content.startswith(bot_pref+'commands'):
