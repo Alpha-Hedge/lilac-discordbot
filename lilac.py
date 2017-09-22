@@ -11,7 +11,7 @@ from CONF_bot import token
 client = discord.Client()
 
 bot_pref = '&&'
-bot_version = '1.0.5'
+bot_version = '1.0.6'
 
 cmnds_info = [bot_pref+'commands', bot_pref+'help', bot_pref+'version', bot_pref+'developer']
 cmnds_testing = [bot_pref+'bugreport', bot_pref+'hello', bot_pref+'args']
@@ -65,7 +65,7 @@ def create_emoji_dict():
 	for i in client.get_server('342825738350886913').emojis:
 		emoji_dict[i.name] = i
 
-	print('Roles:')
+	print('Emojis:')
 	print(emoji_dict)
 
 def get_role(server_roles, target_name):
