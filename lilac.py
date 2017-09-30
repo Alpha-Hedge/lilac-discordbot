@@ -1,7 +1,15 @@
+# IMPORTS
+print('lilac.py: Importing time...')
+import time
+print('RUN DATE: '+time.strftime("%m/%d/%Y")+' '+time.strftime("%H:%M"))
+print('lilac.py: Importing random...')
+import random
 print('lilac.py: Importing asyncio...')
 import asyncio
 print('lilac.py: Importing discord...')
 import discord
+print('lilac.py: Importing threading...')
+import threading
 from discord.ext import commands
 print('lilac.py: Importing db.py...')
 import db
@@ -11,7 +19,13 @@ from CONF_bot import token
 client = discord.Client()
 
 bot_pref = '&&'
-bot_version = '1.0.6'
+bot_version = '1.0.9'
+
+def getDate():
+	return time.strftime("%m/%d/%Y")
+
+def getTime():
+	return time.strftime("%H:%M")
 
 cmnds_info = [bot_pref+'commands', bot_pref+'help', bot_pref+'version', bot_pref+'developer']
 cmnds_testing = [bot_pref+'bugreport', bot_pref+'hello', bot_pref+'args']
@@ -68,6 +82,13 @@ def create_emoji_dict():
 	print('Emojis:')
 	print(emoji_dict)
 
+def create_member_list():
+	global member_list
+	member = []
+	for i in client.get_all_members():
+		member.append(i)
+		print(i)
+
 def get_role(server_roles, target_name):
 	for each in server_roles:
 		if each.name == target_name:
@@ -96,6 +117,27 @@ def findInt(li):
 		except ValueError:
 			pass
 
+# def new_scorekeeper():
+	
+# def writeDate():
+# 	f.close() # Make sure it's closed first
+# 	f = open('date.txt','r')
+# 	f.seek(0)
+# 	f.truncate()
+# 	f.write()
+
+# 	Unfortunately it's a bit... blurry, from here. I can't just add 7 to the current day, that would result
+# 	in things like September 38th, which of course doesn't exist.
+# 	I plan to work on a module that will allow me to add to the date without things like this happening.
+	
+# 	PLANNED FOR 1.1.0
+
+# def dateloop():
+# 	f.seek(0)
+# 	while True:
+# 		if time.strftime("%m/%d/%Y") == str(f.read()):
+# 			print('The date has been reached')
+
 @asyncio.coroutine 
 def background_loop(): 
 	yield from client.wait_until_ready()
@@ -112,6 +154,31 @@ def on_ready():
 	print(client.user)
 	create_role_dict()
 	create_emoji_dict()
+	create_member_list()
+	print('START TIMESTAMP: '+getDate()+' '+getTime())
+
+def dateloop():
+	while True:
+		f = open('date.txt', 'r')
+		f.seek(0)
+		if getDate() == f.read():
+			for i in member_list:
+				if role_dict['scorekeeper'] in i.roles:
+					remove_roles(i,role_dict['scorekeeper'])
+			
+			print('Choosing scorekeeper...')
+			u = member_list[randrange(0,len(member_list))]
+			add_roles(u,role_dict['scorekeeper'])
+			f.close()
+			f = open('date.txt', 'w')
+			f.seek(0)
+			f.write(time.strftime("%d/"+str(int("%m"+7))+"/%Y"))
+			f.close()
+
+
+# thread = threading.Thread(target=dateloop)
+# thread.start()
+
 
 @client.event
 @asyncio.coroutine
@@ -209,10 +276,10 @@ def on_message(message):
 	if message.content.startswith(bot_pref+'score_get'):
 		msg_split = message.content.split()
 		if msg_split[1] == '--all':
-			if message.content.endswith('--embed'):
-				yield from client.send_message(message.channel, embed=db.score_get_all_embed())
-			else:
+			if message.content.endswith('--raw'):
 				yield from client.send_message(message.channel, db.score_get_all_string())
+			else:
+				yield from client.send_message(message.channel, embed=db.score_get_all_embed())
 
 		if len(msg_split) > 1:
 			u = qCheck(msg_split)
@@ -263,6 +330,9 @@ def on_message(message):
 	if message.content in spottedEmojis:
 		yield from client.send_message(message.channel, role_dict['scorekeeper'].mention)
 		yield from client.send_message(message.channel, 'A new spotted doggo!')
+
+	if message.content.startswith(bot_pref+'mod-application'):
+		yield from client.send_message(message.channel, 'Please visit this link: https://goo.gl/forms/EhFTThutYoL6wfxQ2\nModerator applications are open 24/7, unless specified by staff.')
 
 	# Category: Misc; Sub-Category: Jokes/Memes
 	# Category: Misc; Sub-Category: Jokes/Memes; Sub-Category: Videos
