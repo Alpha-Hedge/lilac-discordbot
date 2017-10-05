@@ -1,3 +1,7 @@
+print('db.py: Importing datetime...')
+import datetime
+print('db.py: Importing time...')
+import time
 print('db.py: Importing pyrebase...')
 import pyrebase
 print('db.py: Importing discord...')
@@ -12,6 +16,16 @@ fdb = firebase.database()
 def root_get():
 	# Gets the root of the firebase database and returns it as a dictionary
 	return dict(fdb.child('users').get().val())
+
+def scrkeep_date_get():
+	return fdb.child('scorekeeper_info').child('date').get().val()
+
+def scrkeep_date_set_next():
+	x = time.strftime("%m/%d/%Y")
+	x = datetime.datetime.strptime(x, "%m/%d/%Y")
+	x = (x+datetime.timedelta(days=7))
+	x = x.strftime("%m/%d/%Y")
+	fdb.child('scorekeeper_info').set({'date':x})
 
 # score_*
 def score_get(user):
