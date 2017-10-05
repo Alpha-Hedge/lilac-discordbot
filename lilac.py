@@ -143,29 +143,27 @@ def on_ready():
 	print(member_list)
 	print('START TIMESTAMP: '+getDate()+' '+getTime())
 	# AUTO-SCOREKEEPER
-	def dateloop():
-		while True:
-			if getDate() == db.scrkeep_date_get():
-				for i in member_list:
-					print(i)
-					if role_dict['scorekeeper'] in i.roles:
-						print('32,000 troops in new york harbor')
-						client.remove_roles(i,[role_dict['scorekeeper']])
-						scrk_last = i
-				
-				print(role_dict['scorekeeper'])
-				print([role_dict['scorekeeper']])
-				print('Choosing scorekeeper...')
+
+
+@asyncio.coroutine
+def dateloop():
+	while True:
+		if getDate() == db.scrkeep_date_get():
+			for i in member_list:
+				print(i)
+				scrk_last = i
+				yield from client.remove_roles(discord.utils.get(client.get_server('342825738350886913').members, name=i),discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
+			
+			print('Choosing scorekeeper...')
+			u = member_list[random.randrange(0,len(member_list))]
+			# Keep generating until it's not the last person
+			while u == scrk_last:
 				u = member_list[random.randrange(0,len(member_list))]
-				# Keep generating until it's not the last person
-				while u == scrk_last:
-					u = member_list[random.randrange(0,len(member_list))]
-
-				client.add_roles(u,[role_dict['scorekeeper']])
-				db.scrkeep_date_set_next()
-
-	thread = threading.Thread(target=dateloop)
-	thread.start()
+				yield from client.add_roles(u,discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
+			db.scrkeep_date_set_next()
+			
+thread = threading.Thread(target=dateloop)
+thread.start()
 
 
 @client.event
