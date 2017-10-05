@@ -1,14 +1,19 @@
 # IMPORTS
 print('lilac.py: Importing time...')
+print('Module 1/5')
 import time
 print('RUN DATE: '+time.strftime("%m/%d/%Y")+' '+time.strftime("%H:%M"))
 print('lilac.py: Importing random...')
+print('Module 2/5')
 import random
 print('lilac.py: Importing asyncio...')
+print('Module 3/5')
 import asyncio
 print('lilac.py: Importing discord...')
+print('Module 4/5')
 import discord
 print('lilac.py: Importing threading...')
+print('Module 5/5')
 import threading
 from discord.ext import commands
 print('lilac.py: Importing db.py...')
@@ -19,7 +24,7 @@ from CONF_bot import token
 client = discord.Client()
 
 bot_pref = '&&'
-bot_version = '1.0.9'
+bot_version = '1.1.0'
 
 def getDate():
 	return time.strftime("%m/%d/%Y")
@@ -84,9 +89,9 @@ def create_emoji_dict():
 
 def create_member_list():
 	global member_list
-	member = []
+	member_list = []
 	for i in client.get_all_members():
-		member.append(i)
+		member_list.append(i)
 		print(i)
 
 def get_role(server_roles, target_name):
@@ -103,7 +108,7 @@ def qCheck(li):
 			join_end = i
 		i+=1
 
-	joined = []  
+	joined = []
 	for i in range(join_start, (join_end)+1):
 		joined.append(li[i])
 
@@ -116,27 +121,7 @@ def findInt(li):
 			break
 		except ValueError:
 			pass
-
-# def new_scorekeeper():
-	
-# def writeDate():
-# 	f.close() # Make sure it's closed first
-# 	f = open('date.txt','r')
-# 	f.seek(0)
-# 	f.truncate()
-# 	f.write()
-
-# 	Unfortunately it's a bit... blurry, from here. I can't just add 7 to the current day, that would result
-# 	in things like September 38th, which of course doesn't exist.
-# 	I plan to work on a module that will allow me to add to the date without things like this happening.
-	
-# 	PLANNED FOR 1.1.0
-
-# def dateloop():
-# 	f.seek(0)
-# 	while True:
-# 		if time.strftime("%m/%d/%Y") == str(f.read()):
-# 			print('The date has been reached')
+			
 
 @asyncio.coroutine 
 def background_loop(): 
@@ -155,29 +140,25 @@ def on_ready():
 	create_role_dict()
 	create_emoji_dict()
 	create_member_list()
+	print(member_list)
 	print('START TIMESTAMP: '+getDate()+' '+getTime())
+	# AUTO-SCOREKEEPER
+	def dateloop():
+		while True:
+			if getDate() == db.scrkeep_date_get():
+				for i in member_list:
+					print(i)
+					scrk_user = i
+					if role_dict['scorekeeper'] in i.roles:
+						client.remove_roles(client.get_member_named(scrk_user),role_dict['scorekeeper'])
+				
+				print('Choosing scorekeeper...')
+				u = member_list[random.randrange(0,len(member_list))]
+				client.add_roles(client.get_member_named(u),role_dict['scorekeeper'])
+				db.scrkeep_date_set_next()
 
-def dateloop():
-	while True:
-		f = open('date.txt', 'r')
-		f.seek(0)
-		if getDate() == f.read():
-			for i in member_list:
-				if role_dict['scorekeeper'] in i.roles:
-					remove_roles(i,role_dict['scorekeeper'])
-			
-			print('Choosing scorekeeper...')
-			u = member_list[randrange(0,len(member_list))]
-			add_roles(u,role_dict['scorekeeper'])
-			f.close()
-			f = open('date.txt', 'w')
-			f.seek(0)
-			f.write(time.strftime("%d/"+str(int("%m"+7))+"/%Y"))
-			f.close()
-
-
-# thread = threading.Thread(target=dateloop)
-# thread.start()
+	thread = threading.Thread(target=dateloop)
+	thread.start()
 
 
 @client.event
@@ -251,7 +232,11 @@ def on_message(message):
 
 				cscr = db.score_get(u)
 
-				yield from client.send_message(message.channel,u+'\'s score was changed from '+str(pscr)+' to '+str(cscr)+'.')
+				embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
+				embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
+				embed.add_field(name="Previous value:", value=str(pscr), inline=False)
+				embed.add_field(name="Current value:", value=str(cscr), inline=False)
+				yield from client.send_message(message.channel,embed=embed)
 
 			elif role_dict['scorekeeper'] not in message.author.roles:
 				yield from client.send_message(message.channel, 'You don\'t have the scorekeeper role.')
@@ -268,7 +253,11 @@ def on_message(message):
 
 				cscr = db.score_get(u)
 
-				yield from client.send_message(message.channel,u+'\'s score was changed from '+str(pscr)+' to '+str(cscr)+'.')
+				embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
+				embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
+				embed.add_field(name="Previous value:", value=str(pscr), inline=False)
+				embed.add_field(name="Current value:", value=str(cscr), inline=False)
+				yield from client.send_message(message.channel,embed=embed)
 
 			elif role_dict['scorekeeper'] not in message.author.roles:
 				yield from client.send_message(message.channel, 'You don\'t have the scorekeeper role.')
