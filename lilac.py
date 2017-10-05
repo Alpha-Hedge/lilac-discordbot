@@ -148,13 +148,20 @@ def on_ready():
 			if getDate() == db.scrkeep_date_get():
 				for i in member_list:
 					print(i)
-					scrk_user = i
 					if role_dict['scorekeeper'] in i.roles:
-						client.remove_roles(client.get_member_named(scrk_user),role_dict['scorekeeper'])
+						print('32,000 troops in new york harbor')
+						client.remove_roles(i,[role_dict['scorekeeper']])
+						scrk_last = i
 				
+				print(role_dict['scorekeeper'])
+				print([role_dict['scorekeeper']])
 				print('Choosing scorekeeper...')
 				u = member_list[random.randrange(0,len(member_list))]
-				client.add_roles(client.get_member_named(u),role_dict['scorekeeper'])
+				# Keep generating until it's not the last person
+				while u == scrk_last:
+					u = member_list[random.randrange(0,len(member_list))]
+
+				client.add_roles(u,[role_dict['scorekeeper']])
 				db.scrkeep_date_set_next()
 
 	thread = threading.Thread(target=dateloop)
