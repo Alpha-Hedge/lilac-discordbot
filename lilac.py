@@ -147,6 +147,7 @@ def on_ready():
 
 @asyncio.coroutine
 def dateloop():
+	print('LOG while True')
 	while True:
 		print('LOG A')
 		if getDate() == db.scrkeep_date_get():
@@ -163,6 +164,8 @@ def dateloop():
 				u = member_list[random.randrange(0,len(member_list))]
 				yield from client.add_roles(u,discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
 			db.scrkeep_date_set_next()
+
+asyncio.async(dateloop())
 			
 thread = threading.Thread(target=dateloop)
 thread.start()
