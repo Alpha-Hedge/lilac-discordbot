@@ -142,7 +142,7 @@ def on_ready():
 	print(client.user)
 	create_role_dict()
 	create_emoji_dict()
-	create_member_list("log")
+	# create_member_list("log")
 	print(member_list)
 	print('START TIMESTAMP: '+getDate()+' '+getTime())
 	# AUTO-SCOREKEEPER
@@ -150,7 +150,7 @@ def on_ready():
 
 @asyncio.coroutine
 def dateloop():
-	create_member_list("silent")
+	create_member_list("log")
 	print('LOG while True')
 	while True:
 		print('LOG A')
@@ -162,10 +162,10 @@ def dateloop():
 				yield from client.remove_roles(discord.utils.get(client.get_server('342825738350886913').members, name=i),discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
 			
 			print('Choosing scorekeeper...')
-			u = member_list[random.randrange(0,len(member_list))]
+			u = random.choice(member_list)
 			# Keep generating until it's not the last person
 			while u == scrk_last:
-				u = member_list[random.randrange(0,len(member_list))]
+				u = random.choice(member_list)
 				yield from client.add_roles(u,discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
 			db.scrkeep_date_set_next()
 
