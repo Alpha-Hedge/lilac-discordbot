@@ -87,12 +87,15 @@ def create_emoji_dict():
 	print('Emojis:')
 	print(emoji_dict)
 
-def create_member_list():
+def create_member_list(mode):
 	global member_list
 	member_list = []
 	for i in client.get_all_members():
 		member_list.append(i)
-		print(i)
+		if mode == "log":
+			print(i)
+		elif mode == "silent":
+			pass
 
 def get_role(server_roles, target_name):
 	for each in server_roles:
@@ -139,7 +142,7 @@ def on_ready():
 	print(client.user)
 	create_role_dict()
 	create_emoji_dict()
-	create_member_list()
+	create_member_list("log")
 	print(member_list)
 	print('START TIMESTAMP: '+getDate()+' '+getTime())
 	# AUTO-SCOREKEEPER
@@ -147,6 +150,7 @@ def on_ready():
 
 @asyncio.coroutine
 def dateloop():
+	create_member_list("silent")
 	print('LOG while True')
 	while True:
 		print('LOG A')
