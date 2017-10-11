@@ -13,7 +13,7 @@ firebase = pyrebase.initialize_app(config)
 
 fdb = firebase.database()
 
-def root_get():
+def user_ref():
 	# Gets the root of the firebase database and returns it as a dictionary
 	return dict(fdb.child('users').get().val())
 
@@ -26,6 +26,12 @@ def scrkeep_date_set_next():
 	x = (x+datetime.timedelta(days=7))
 	x = x.strftime("%m/%d/%Y")
 	fdb.child('scorekeeper_info').set({'date':x})
+
+def check_for_user(user):
+	if user in user_ref():
+		return True
+	else:
+		return False
 
 # score_*
 def score_get(user):

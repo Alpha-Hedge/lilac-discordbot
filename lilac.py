@@ -24,7 +24,7 @@ from CONF_bot import token
 client = discord.Client()
 
 bot_pref = '&&'
-bot_version = '1.1.0'
+bot_version = '1.0.91'
 
 def getDate():
 	return time.strftime("%m/%d/%Y")
@@ -148,7 +148,9 @@ def on_ready():
 @asyncio.coroutine
 def dateloop():
 	while True:
+		print('LOG A')
 		if getDate() == db.scrkeep_date_get():
+			print('LOG B')
 			for i in member_list:
 				print(i)
 				scrk_last = i
@@ -231,17 +233,21 @@ def on_message(message):
 			if role_dict['scorekeeper'] in message.author.roles:
 				u = qCheck(msg_split)
 
-				pscr = db.score_get(u)
+				if db.check_for_user(u):
+					pscr = db.score_get(u)
 
-				db.score_add(u, findInt(msg_split))
+					db.score_add(u, findInt(msg_split))
 
-				cscr = db.score_get(u)
+					cscr = db.score_get(u)
 
-				embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
-				embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
-				embed.add_field(name="Previous value:", value=str(pscr), inline=False)
-				embed.add_field(name="Current value:", value=str(cscr), inline=False)
-				yield from client.send_message(message.channel,embed=embed)
+					embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
+					embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
+					embed.add_field(name="Previous value:", value=str(pscr), inline=False)
+					embed.add_field(name="Current value:", value=str(cscr), inline=False)
+					yield from client.send_message(message.channel,embed=embed)
+
+				elif db.check_for_user(u) == False:
+					yield from client.send_message(message.channel,"The user '"+u+"' is not in the database. Use &&register_user to add them.")
 
 			elif role_dict['scorekeeper'] not in message.author.roles:
 				yield from client.send_message(message.channel, 'You don\'t have the scorekeeper role.')
@@ -252,17 +258,21 @@ def on_message(message):
 			if role_dict['scorekeeper'] in message.author.roles:
 				u = qCheck(msg_split)
 
-				pscr = db.score_get(u)
+				if db.check_for_user(u):
+					pscr = db.score_get(u)
 
-				db.score_del(u, findInt(msg_split))
+					db.score_del(u, findInt(msg_split))
 
-				cscr = db.score_get(u)
+					cscr = db.score_get(u)
 
-				embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
-				embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
-				embed.add_field(name="Previous value:", value=str(pscr), inline=False)
-				embed.add_field(name="Current value:", value=str(cscr), inline=False)
-				yield from client.send_message(message.channel,embed=embed)
+					embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
+					embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
+					embed.add_field(name="Previous value:", value=str(pscr), inline=False)
+					embed.add_field(name="Current value:", value=str(cscr), inline=False)
+					yield from client.send_message(message.channel,embed=embed)
+					
+				elif db.check_for_user(u) == False:
+					yield from client.send_message(message.channel,"The user '"+u+"' is not in the database. Use &&register_user to add them.")
 
 			elif role_dict['scorekeeper'] not in message.author.roles:
 				yield from client.send_message(message.channel, 'You don\'t have the scorekeeper role.')
