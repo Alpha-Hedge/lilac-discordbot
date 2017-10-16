@@ -33,20 +33,28 @@ def check_for_user(user):
 	else:
 		return False
 
+def check_for_alias(alias):
+	for i in user_ref():
+		if alias == user_ref()[i]['alias']:
+			return True, user_ref()[i]
+			break
+		else:
+			return False
+
 # score_*
 def score_get(user):
 	return fdb.child('users').child(user).child('points').get().val()
 
 def score_add(user,value):
 	cval = score_get(user)
-	fdb.child('users').child(user).set({'points': cval+value})
+	fdb.child('users').child(user).update({'points': cval+value})
 
 def score_del(user,value):
 	cval = score_get(user)
-	fdb.child('users').child(user).set({'points': cval-value})
+	fdb.child('users').child(user).update({'points': cval-value})
 
 def score_reset(user):
-	fdb.child('users').child(user).set({'points': 0})
+	fdb.child('users').child(user).update({'points': 0})
 
 def score_get_all_string():
 	x = fdb.child('users').get().val()
@@ -85,4 +93,4 @@ def last_dog_update_url(url):
 
 # user_*
 def user_register(user):
-	fdb.child('users').update({user: {'points': 0}})
+	fdb.child('users').update({user: {'alias':'','points': 0}})
