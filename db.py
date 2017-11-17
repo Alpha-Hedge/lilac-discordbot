@@ -13,7 +13,7 @@ firebase = pyrebase.initialize_app(config)
 
 fdb = firebase.database()
 
-def user_ref():
+def user_ref_get():
 	# Gets the root of the firebase database and returns it as a dictionary
 	return dict(fdb.child('users').get().val())
 
@@ -28,30 +28,27 @@ def scrkeep_date_set_next():
 	fdb.child('scorekeeper_info').set({'date':x})
 
 def check_for_user(user):
-	if user in user_ref():
+	if user in user_ref_get():
 		return True
 	else:
 		return False
 
-def check_for_alias(alias):
-	for i in user_ref():
-		if alias == user_ref()[i]['alias']:
-			return True, user_ref()[i]
-			break
-		else:
-			return False
 
 # score_*
 def score_get(user):
 	return fdb.child('users').child(user).child('points').get().val()
 
 def score_add(user,value):
+	print(user)
+	print(value)
 	cval = score_get(user)
-	fdb.child('users').child(user).update({'points': cval+value})
+	fdb.child('users').child(user).update({'points': cval+int(value)})
 
 def score_del(user,value):
+	print(user)
+	print(value)
 	cval = score_get(user)
-	fdb.child('users').child(user).update({'points': cval-value})
+	fdb.child('users').child(user).update({'points': cval-int(value)})
 
 def score_reset(user):
 	fdb.child('users').child(user).update({'points': 0})
@@ -94,3 +91,12 @@ def last_dog_update_url(url):
 # user_*
 def user_register(user):
 	fdb.child('users').update({user: {'alias':'','points': 0}})
+
+# def user_clone(user,new_user):
+# 	fdb.child('users').update({new_user: user})
+
+# def user_name_change(name_prev,name_new):
+# 	print(name_prev)
+# 	user_clone(name_prev,name_new)
+# 	fdb.child('users').child(name_prev).remove()
+# 	print(name_new)

@@ -25,6 +25,7 @@ client = discord.Client()
 
 bot_pref = '&&'
 bot_version = '1.0.91'
+help_pref = '&?'
 
 def getDate():
 	return time.strftime("%m/%d/%Y")
@@ -78,6 +79,7 @@ def create_role_dict():
 	print('Roles:')
 	print(role_dict)
 
+
 def create_emoji_dict():
 	global emoji_dict
 	emoji_dict = {}
@@ -87,6 +89,7 @@ def create_emoji_dict():
 	print('Emojis:')
 	print(emoji_dict)
 
+
 def create_member_list():
 	global member_list
 	member_list = []
@@ -94,11 +97,13 @@ def create_member_list():
 		member_list.append(i)
 		print(i)
 
+
 def get_role(server_roles, target_name):
 	for each in server_roles:
 		if each.name == target_name:
 			return each
 	return None
+
 
 def qCheck(li):
 	for i in range(len(li)):
@@ -113,6 +118,7 @@ def qCheck(li):
 		joined.append(li[i])
 
 	return ' '.join(joined).replace('"','')
+
 
 def findInt(li):
 	for i in range(len(li)):
@@ -132,6 +138,7 @@ def background_loop():
 		yield from client.send_message(channel, random.choice(messages))
 		yield from asyncio.sleep(120)
 
+
 @client.event
 @asyncio.coroutine
 def on_ready():
@@ -145,27 +152,27 @@ def on_ready():
 	# AUTO-SCOREKEEPER
 
 
-@asyncio.coroutine
-def dateloop():
-	while True:
-		print('LOG A')
-		if getDate() == db.scrkeep_date_get():
-			print('LOG B')
-			for i in member_list:
-				print(i)
-				scrk_last = i
-				yield from client.remove_roles(discord.utils.get(client.get_server('342825738350886913').members, name=i),discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
+# @asyncio.coroutine
+# def dateloop():
+# 	while True:
+# 		print('LOG A')
+# 		if getDate() == db.scrkeep_date_get():
+# 			print('LOG B')
+# 			for i in member_list:
+# 				print(i)
+# 				scrk_last = i
+# 				yield from client.remove_roles(discord.utils.get(client.get_server('342825738350886913').members, name=i),discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
 			
-			print('Choosing scorekeeper...')
-			u = member_list[random.randrange(0,len(member_list))]
-			# Keep generating until it's not the last person
-			while u == scrk_last:
-				u = member_list[random.randrange(0,len(member_list))]
-				yield from client.add_roles(u,discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
-			db.scrkeep_date_set_next()
+# 			print('Choosing scorekeeper...')
+# 			u = member_list[random.randrange(0,len(member_list))]
+# 			# Keep generating until it's not the last person
+# 			while u == scrk_last:
+# 				u = member_list[random.randrange(0,len(member_list))]
+# 				yield from client.add_roles(u,discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
+# 			db.scrkeep_date_set_next()
 			
-thread = threading.Thread(target=dateloop)
-thread.start()
+# thread = threading.Thread(target=dateloop)
+# thread.start()
 
 
 @client.event
@@ -181,7 +188,7 @@ def on_message(message):
 
 	# DEV-ONLY COMMANDS
 	# These commands can only be used by someone with the 'lilac developer' role; in the case of debugging or beta commands/features
-	if role_dict['lilac owner/developer'] in message.author.roles:
+	if role_dict['lilac developer'] in message.author.roles:
 		pass
 
 	# Category: Roles
@@ -190,7 +197,7 @@ def on_message(message):
 		print(role)
 		msg_split = (message.content.split())
 		if message.content.endswith('--list'):
-			embed=discord.Embed(title="Color Role List", description="All self-assignable color roles.", color=0xff00ff)
+			embed=discord.Embed(title="Color Role List", description="All color roles.", color=0xff00ff)
 			embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
 			for i in role_dict:
 				if i.startswith('col.'):
@@ -231,12 +238,15 @@ def on_message(message):
 		msg_split = message.content.split()
 		if len(msg_split) > 2:
 			if role_dict['scorekeeper'] in message.author.roles:
-				u = qCheck(msg_split)
+				u = msg_split[1]
+
+				if message.content.endswith('--repScore') or message.content.endswith('-u'):
+					u = u.replace('_',' ')
 
 				if db.check_for_user(u):
 					pscr = db.score_get(u)
 
-					db.score_add(u, findInt(msg_split))
+					db.score_add(u, msg_split[2])
 
 					cscr = db.score_get(u)
 
@@ -256,12 +266,15 @@ def on_message(message):
 		msg_split = message.content.split()
 		if len(msg_split) > 2:
 			if role_dict['scorekeeper'] in message.author.roles:
-				u = qCheck(msg_split)
+				u = msg_split[1]
+
+				if message.content.endswith('--repScore') or message.content.endswith('-u'):
+					u = u.replace('_',' ')
 
 				if db.check_for_user(u):
 					pscr = db.score_get(u)
 
-					db.score_del(u, findInt(msg_split))
+					db.score_del(u, msg_split[2])
 
 					cscr = db.score_get(u)
 
@@ -279,55 +292,28 @@ def on_message(message):
 
 	if message.content.startswith(bot_pref+'score_get'):
 		msg_split = message.content.split()
-		if msg_split[1] == '--all':
-			if message.content.endswith('--raw'):
-				yield from client.send_message(message.channel, db.score_get_all_string())
+		if message.content.endswith('--all'):
+			yield from client.send_message(message.channel, embed=db.score_get_all_embed())
+		else:
+			u = msg_split[1]
+			if message.content.endswith('--repScore') or message.content.endswith('-u'):
+				u = u.replace('_',' ')
+				yield from client.send_message(message.channel, db.score_get(u))
 			else:
-				yield from client.send_message(message.channel, embed=db.score_get_all_embed())
-
-		if len(msg_split) > 1:
-			u = qCheck(msg_split)
-			yield from client.send_message(message.channel, db.score_get(u))
-
-	# if (message.content.startswith(bot_pref+'score_get_all')) or (message.content.startswith(bot_pref+'scoreboard')):
-	# 	msg_split = message.content.split()
-	# 	if message.content.endswith('--embed'):
-	# 		yield from client.send_message(message.channel, embed=db.score_get_all_embed())
-	# 	else:
-	# 		yield from client.send_message(message.channel, db.score_get_all_string())
-
-	if message.content.startswith('&:score_get_all_raw'):
-		scr_RAW = db.score_get_all_raw()
-		print(scr_RAW)
-
-	if message.content.startswith(bot_pref+'score_reset'):
-		msg_split = message.content.split()
-		u = qCheck(msg_split)
-
-		yield from client.send_message(message.channel, 'Are you sure you want to reset '+u+'\'s score? [Yes/No]')
-		msg = yield from client.wait_for_message(author=message.author, content='Yes')
-		db.score_reset(u)
-		yield from client.send_message(message.channel, u+'\'s score has been reset to 0.')
-
-	# if message.channel == "spotted-doggos":
-	# 	if message.content.startswith('https://cdn.discordapp.com/attachments/'):
-	# 		db.last_dog_update_url(message.content)
-
-	if message.content.startswith(bot_pref+'latest_doggo_get_URL'):
-		yield from client.send_message(message.channel, db.last_dog_get_url())
-
-	if message.content.startswith(bot_pref+'latest_doggo_update_URL'):
-		msg_split = message.content.split()
-		URL = qCheck(msg_split)
-		db.last_dog_update_url(URL)
+				yield from client.send_message(message.channel, db.score_get(u))
 
 		yield from client.send_message(message.channel, db.last_dog_get_url())
 
 
-	if message.content.startswith(bot_pref+'register_user'):
+	if message.content.startswith(bot_pref+'user_register'):
 		msg_split = message.content.split()
-		u = qCheck(msg_split)
-		db.user_register(u)
+		u = msg_split[1]
+		if message.content.endswith('--repScore') or message.content.endswith('-u'):
+			u = u.replace('_',' ')
+			db.user_register(u)
+		else:
+			db.user_register(u)
+
 		yield from client.send_message(message.channel, u+' has been added into the scoreboard database.')
 
 	# Category: Misc
@@ -335,7 +321,7 @@ def on_message(message):
 		yield from client.send_message(message.channel, role_dict['scorekeeper'].mention)
 		yield from client.send_message(message.channel, 'A new spotted doggo!')
 
-	if message.content.startswith(bot_pref+'mod-application'):
+	if message.content.startswith(bot_pref+'mod_form'):
 		yield from client.send_message(message.channel, 'Please visit this link: https://goo.gl/forms/EhFTThutYoL6wfxQ2\nModerator applications are open 24/7, unless specified by staff.')
 
 	# Category: Misc; Sub-Category: Jokes/Memes
@@ -366,44 +352,13 @@ def on_message(message):
 	if message.content.startswith('i would like to purchase bamboozle insurance'):
 		yield from client.send_message(message.channel, 'https://i.redd.it/e8rf2wd4zvxy.png')
 
-	# Category: Info
-	if message.content.startswith(bot_pref+'commands'):
-		msg_split = message.content.split()
-		if msg_split[1] == 'info':
-			yield from client.send_message(message.channel, cmnds_info)
-
-		if msg_split[1] == 'database':
-			yield from client.send_message(message.channel, 'Database commands can only be used by someone with the scorekeeper role.')
-			yield from client.send_message(message.channel, cmnds_database)
-
-		if msg_split[1] == 'testing':
-			yield from client.send_message(message.channel, cmnds_testing)
-
-	if message.content.startswith(bot_pref+'categories'):
-		yield from client.send_message(message.channel, categories)
-
-	if message.content.startswith(bot_pref+'help'):
-		msg_split = message.content.split()
-		if msg_split[1] == 'info':
-			yield from client.send_message(message.channel, help_info[msg_split[2]])
-
-		if msg_split[1] == 'database':
-			yield from client.send_message(message.channel, help_database[msg_split[2]])
-
-		if msg_split[1] == 'testing':
-			yield from client.send_message(message.channel, help_testing[msg_split[2]])
-
-		else:
-			yield from client.send_message(message.channel, 'No help entry for this command yet.')
-
-	if message.content.startswith(bot_pref+'info'):
-		if message.content.endswith('--version'):
-			yield from client.send_message(message.channel, 'Current version: Lilac v'+bot_version)
-
-		elif message.content.endswith('--developer'):
-			yield from client.send_message(message.channel, 'This bot is developed by Alphys Hedge.')
-
 	# Category: Testing / Troubleshooting
+	# if message.content.startswith(bot_pref+'user_name_change'):
+	# 	msg_split = message.content.split()
+	# 	prev_name = 'TMP_TEST_USR'
+	# 	db.user_name_change(prev_name,msg_split[1])
+	# 	yield from client.send_message(message.channel, 'Name of '+prev_name+' changed to '+msg_split[1])
+
 	if message.content.startswith(bot_pref+'EMBED'):
 		embed=discord.Embed(title="Embed Test!", description="This is a test command for the embed object feature.", color=0xff00ff)
 		embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
@@ -419,12 +374,12 @@ def on_message(message):
 	if message.content.startswith(bot_pref+'role-list'):
 		print(message.author.roles)
 
-	if message.content.startswith(bot_pref+'bugreport'):
-		msg_split = message.content.split()
-		rmsg = qCheck(msg_split)
+	# if message.content.startswith(bot_pref+'bugreport'):
+	# 	msg_split = message.content.split()
+	# 	rmsg = qCheck(msg_split)
 
-		yield from client.send_message(developer, str(message.author)+' has sent a bug report: '+rmsg)
-		yield from client.send_message(message.channel, 'Your bug report has been sent to the developer.')
+	# 	yield from client.send_message(developer, str(message.author)+' has sent a bug report: '+rmsg)
+	# 	yield from client.send_message(message.channel, 'Your bug report has been sent to the developer.')
 
 	if message.content.startswith(bot_pref+'hello'):
 		yield from client.send_message(message.channel, 'Hi! :D')
@@ -438,5 +393,7 @@ def on_message(message):
 				yield from client.send_message(message.channel, 'Invalid second argument.')
 		else:
 			yield from client.send_message(message.channel, 'No arguments specified.')
+
+	# Category: Help commands
 
 client.run(token)
