@@ -17,6 +17,10 @@ def user_ref_get():
 	# Gets the root of the firebase database and returns it as a dictionary
 	return dict(fdb.child('users').get().val())
 
+def alias_ref_get():
+	# Gets the root of the firebase database and returns it as a dictionary
+	return dict(fdb.child('aliases').get().val())
+
 def scrkeep_date_get():
 	return fdb.child('scorekeeper_info').child('date').get().val()
 
@@ -33,6 +37,11 @@ def check_for_user(user):
 	else:
 		return False
 
+def check_for_alias(user):
+	if user in alias_ref_get():
+		return True, alias_ref_get()[user]
+	else:
+		return False, ''
 
 # score_*
 def score_get(user):
@@ -90,13 +99,10 @@ def last_dog_update_url(url):
 
 # user_*
 def user_register(user):
-	fdb.child('users').update({user: {'alias':'','points': 0}})
+	fdb.child('users').update({user: {'points': 0}})
 
-# def user_clone(user,new_user):
-# 	fdb.child('users').update({new_user: user})
+def user_alias_add(user,alias):
+	fdb.child('aliases').update({alias:user})
 
-# def user_name_change(name_prev,name_new):
-# 	print(name_prev)
-# 	user_clone(name_prev,name_new)
-# 	fdb.child('users').child(name_prev).remove()
-# 	print(name_new)
+def user_alias_remove(alias):
+	fdb.child('aliases').child(alias).remove()

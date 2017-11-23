@@ -105,7 +105,7 @@ def get_role(server_roles, target_name):
 	return None
 
 
-def qCheck(li):
+def qCheck(li): # Only still here in case something else uses it
 	for i in range(len(li)):
 		if li[i].startswith('"'):
 			join_start = i
@@ -210,37 +210,14 @@ def on_message(message):
 
 			yield from client.send_message(message.channel, embed=embed)
 
-		# elif message.content.endswith('--changeto'):
-		# 	col = msg_split[1]
-		# 	print('LINE 130 log:: col')
-		# 	print(col)
-		# 	print('LINE 133 log:: role_dict[col]')
-		# 	print(role_dict[col])
-		# 	print(role_dict['colpink'])
-		# 	discord.Client.add_roles(message.author, role_dict[col])
-		# 	print(message.author.roles)
-		# 	for i in message.author.roles:
-		# 		print(i)
-		# 		if i.name.startswith('[col]'):
-		# 			# A (FAILED)
-		# 			# client.remove_roles(message.author, role_dict[i])
-		# 			# print(role_dict[i])						
-		# 			# B (FAILED)
-		# 			client.remove_roles(message.author, role_dict[str(i)])
-		# 			print(role_dict[str(i)])
-		# 			# C (FAILED)
-		# 			# client.remove_roles(message.author, i)
-		# 			# print('LINE 147 log:: i')
-		# 			print(i)
-
 	# Category: Database Handling
-	if message.content.startswith(bot_pref+'score_add'):
+	if message.content.startswith(bot_pref+'scoreAdd'):
 		msg_split = message.content.split()
 		if len(msg_split) > 2:
 			if role_dict['scorekeeper'] in message.author.roles:
 				u = msg_split[1]
 
-				if message.content.endswith('--repScore') or message.content.endswith('-u'):
+				if message.content.endswith('-u'):
 					u = u.replace('_',' ')
 
 				if db.check_for_user(u):
@@ -257,18 +234,33 @@ def on_message(message):
 					yield from client.send_message(message.channel,embed=embed)
 
 				elif db.check_for_user(u) == False:
-					yield from client.send_message(message.channel,"The user '"+u+"' is not in the database. Use &&register_user to add them.")
+					if db.check_for_alias(u)[0] == True:
+						u = db.check_for_alias(u)[1]
+						pscr = db.score_get(u)
+
+						db.score_add(u, msg_split[2])
+
+						cscr = db.score_get(u)
+
+						embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
+						embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
+						embed.add_field(name="Previous value:", value=str(pscr), inline=False)
+						embed.add_field(name="Current value:", value=str(cscr), inline=False)
+						yield from client.send_message(message.channel,embed=embed)
+
+				else:
+					yield from client.send_message(message.channel,"The user '"+u+"' is not in the database. Use `&&user_register` to add them.")
 
 			elif role_dict['scorekeeper'] not in message.author.roles:
 				yield from client.send_message(message.channel, 'You don\'t have the scorekeeper role.')
 
-	if message.content.startswith(bot_pref+'score_del'):
+	if message.content.startswith(bot_pref+'scoreDel'):
 		msg_split = message.content.split()
 		if len(msg_split) > 2:
 			if role_dict['scorekeeper'] in message.author.roles:
 				u = msg_split[1]
 
-				if message.content.endswith('--repScore') or message.content.endswith('-u'):
+				if message.content.endswith('-u'):
 					u = u.replace('_',' ')
 
 				if db.check_for_user(u):
@@ -285,30 +277,55 @@ def on_message(message):
 					yield from client.send_message(message.channel,embed=embed)
 					
 				elif db.check_for_user(u) == False:
-					yield from client.send_message(message.channel,"The user '"+u+"' is not in the database. Use &&register_user to add them.")
+					if db.check_for_alias(u)[0] == True:
+						u = db.check_for_alias(u)[1]
+						pscr = db.score_get(u)
+
+						db.score_del(u, msg_split[2])
+
+						cscr = db.score_get(u)
+
+						embed=discord.Embed(title="Score Changed", description=u+"\'s score has been updated.", color=0xff00ff)
+						embed.set_author(name="Lilac", icon_url='https://images.discordapp.net/avatars/346529910212526090/9e87ca1be76d6ab16f43615d362ef740.png?size=1024')
+						embed.add_field(name="Previous value:", value=str(pscr), inline=False)
+						embed.add_field(name="Current value:", value=str(cscr), inline=False)
+						yield from client.send_message(message.channel,embed=embed)
+
+				else:
+					yield from client.send_message(message.channel,"The user '"+u+"' is not in the database. Use &&registerUser to add them.")
 
 			elif role_dict['scorekeeper'] not in message.author.roles:
 				yield from client.send_message(message.channel, 'You don\'t have the scorekeeper role.')
 
-	if message.content.startswith(bot_pref+'score_get'):
+	if message.content.startswith(bot_pref+'scoreGet'):
 		msg_split = message.content.split()
 		if message.content.endswith('--all'):
 			yield from client.send_message(message.channel, embed=db.score_get_all_embed())
 		else:
 			u = msg_split[1]
-			if message.content.endswith('--repScore') or message.content.endswith('-u'):
-				u = u.replace('_',' ')
-				yield from client.send_message(message.channel, db.score_get(u))
+			if db.check_for_user(u):
+				if message.content.endswith('-u'):
+					u = u.replace('_',' ')
+					yield from client.send_message(message.channel, db.score_get(u))
+				else:
+					yield from client.send_message(message.channel, db.score_get(u))
+
+			elif db.check_for_user(u) == False:
+				if db.check_for_alias(u)[0] == True:
+					u = db.check_for_alias(u)[1]
+					if message.content.endswith('-u'):
+						u = u.replace('_',' ')
+						yield from client.send_message(message.channel, db.score_get(u))
+					else:
+						yield from client.send_message(message.channel, db.score_get(u))
+
 			else:
-				yield from client.send_message(message.channel, db.score_get(u))
+				yield from client.send_message(message.channel, 'That user could not be found. Names are case-sensitive, maybe you used the wrong capitalization?')
 
-		yield from client.send_message(message.channel, db.last_dog_get_url())
-
-
-	if message.content.startswith(bot_pref+'user_register'):
+	if message.content.startswith(bot_pref+'registerUser'):
 		msg_split = message.content.split()
 		u = msg_split[1]
-		if message.content.endswith('--repScore') or message.content.endswith('-u'):
+		if message.content.endswith('-u'):
 			u = u.replace('_',' ')
 			db.user_register(u)
 		else:
@@ -316,12 +333,33 @@ def on_message(message):
 
 		yield from client.send_message(message.channel, u+' has been added into the scoreboard database.')
 
+	# Aliasing
+	if message.content.startswith(bot_pref+'aliasAdd'):
+		msg_split = message.content.split()
+		u = msg_split[1]
+		a = msg_split[2]
+		if message.content.endswith('-u'):
+			u = u.replace('_',' ')
+			a = a.replace('_',' ')
+
+		db.user_alias_add(u,a)
+		yield from client.send_message(message.channel, 'The alias "'+a+'" was created for the user "'+u+'". Try `&&score_get '+msg_split[2]+'` to confirm.')
+
+	if message.content.startswith(bot_pref+'aliasRemove'):
+		msg_split = message.content.split()
+		a = msg_split[1]
+		if message.content.endswith('-u'):
+			a = a.replace('_',' ')
+
+		db.user_alias_remove(a)
+		yield from client.send_message(message.channel, 'The alias "'+a+'" was removed.')
+
 	# Category: Misc
 	if message.content in spottedEmojis:
 		yield from client.send_message(message.channel, role_dict['scorekeeper'].mention)
 		yield from client.send_message(message.channel, 'A new spotted doggo!')
 
-	if message.content.startswith(bot_pref+'mod_form'):
+	if message.content.startswith(bot_pref+'modForm'):
 		yield from client.send_message(message.channel, 'Please visit this link: https://goo.gl/forms/EhFTThutYoL6wfxQ2\nModerator applications are open 24/7, unless specified by staff.')
 
 	# Category: Misc; Sub-Category: Jokes/Memes
@@ -395,5 +433,7 @@ def on_message(message):
 			yield from client.send_message(message.channel, 'No arguments specified.')
 
 	# Category: Help commands
+	if message.content.startswith(bot_pref+'help') or message.content.startswith('readme'):
+		yield from client.send_message(message.channel, 'Please read the README file on GitHub: https://github.com/Alpha-Hedge/lilac-discordbot/blob/master/README.md')
 
 client.run(token)
