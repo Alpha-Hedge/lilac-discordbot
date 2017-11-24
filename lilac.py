@@ -23,9 +23,8 @@ from CONF_bot import token
 
 client = discord.Client()
 
-bot_pref = '&&'
-bot_version = '1.0.91'
-help_pref = '&?'
+bot_pref = '+'
+bot_version = '1.1.0'
 
 def getDate():
 	return time.strftime("%m/%d/%Y")
@@ -149,30 +148,6 @@ def on_ready():
 	create_member_list()
 	print(member_list)
 	print('START TIMESTAMP: '+getDate()+' '+getTime())
-	# AUTO-SCOREKEEPER
-
-
-# @asyncio.coroutine
-# def dateloop():
-# 	while True:
-# 		print('LOG A')
-# 		if getDate() == db.scrkeep_date_get():
-# 			print('LOG B')
-# 			for i in member_list:
-# 				print(i)
-# 				scrk_last = i
-# 				yield from client.remove_roles(discord.utils.get(client.get_server('342825738350886913').members, name=i),discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
-			
-# 			print('Choosing scorekeeper...')
-# 			u = member_list[random.randrange(0,len(member_list))]
-# 			# Keep generating until it's not the last person
-# 			while u == scrk_last:
-# 				u = member_list[random.randrange(0,len(member_list))]
-# 				yield from client.add_roles(u,discord.utils.get(client.get_server('342825738350886913').roles, name="scorekeeper"))
-# 			db.scrkeep_date_set_next()
-			
-# thread = threading.Thread(target=dateloop)
-# thread.start()
 
 
 @client.event
@@ -303,21 +278,16 @@ def on_message(message):
 			yield from client.send_message(message.channel, embed=db.score_get_all_embed())
 		else:
 			u = msg_split[1]
-			if db.check_for_user(u):
-				if message.content.endswith('-u'):
+			if message.content.endswith('-u'):
 					u = u.replace('_',' ')
-					yield from client.send_message(message.channel, db.score_get(u))
-				else:
-					yield from client.send_message(message.channel, db.score_get(u))
+
+			if db.check_for_user(u):
+				yield from client.send_message(message.channel, db.score_get(u))
 
 			elif db.check_for_user(u) == False:
 				if db.check_for_alias(u)[0] == True:
 					u = db.check_for_alias(u)[1]
-					if message.content.endswith('-u'):
-						u = u.replace('_',' ')
-						yield from client.send_message(message.channel, db.score_get(u))
-					else:
-						yield from client.send_message(message.channel, db.score_get(u))
+					yield from client.send_message(message.channel, db.score_get(u))
 
 			else:
 				yield from client.send_message(message.channel, 'That user could not be found. Names are case-sensitive, maybe you used the wrong capitalization?')
@@ -343,7 +313,7 @@ def on_message(message):
 			a = a.replace('_',' ')
 
 		db.user_alias_add(u,a)
-		yield from client.send_message(message.channel, 'The alias "'+a+'" was created for the user "'+u+'". Try `&&score_get '+msg_split[2]+'` to confirm.')
+		yield from client.send_message(message.channel, 'The alias "'+a+'" was created for the user "'+u+'". Try `+scoreGet '+a+'` to confirm.')
 
 	if message.content.startswith(bot_pref+'aliasRemove'):
 		msg_split = message.content.split()
@@ -389,13 +359,6 @@ def on_message(message):
 
 	if message.content.startswith('i would like to purchase bamboozle insurance'):
 		yield from client.send_message(message.channel, 'https://i.redd.it/e8rf2wd4zvxy.png')
-
-	# Category: Testing / Troubleshooting
-	# if message.content.startswith(bot_pref+'user_name_change'):
-	# 	msg_split = message.content.split()
-	# 	prev_name = 'TMP_TEST_USR'
-	# 	db.user_name_change(prev_name,msg_split[1])
-	# 	yield from client.send_message(message.channel, 'Name of '+prev_name+' changed to '+msg_split[1])
 
 	if message.content.startswith(bot_pref+'EMBED'):
 		embed=discord.Embed(title="Embed Test!", description="This is a test command for the embed object feature.", color=0xff00ff)
