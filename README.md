@@ -25,9 +25,9 @@ Current available modifiers:
 + Takes all string arguments and replaces underscores with spaces.  
 
 + Example:  
-  + `&&score_add null_user 5`
+  + `+scoreAdd null_user 5`
   + Adds 5 points to the score of “null_user”.
-  + `&&score_add null_user 5 -u`  
+  + `+scoreAdd null_user 5 -u`  
   + Adds 5 points to the score of “null user”. 
 
 ---
@@ -40,19 +40,19 @@ Current available modifiers:
 
 **(Only users with the “scorekeeper” role can use the commands below.)**
 
-`&&score_add :user: :amount: <modifier>`  
+`+scoreAdd :user: :amount: <modifier>`  
 Adds `:amount:` to score of `:user:`.  
 Valid modifiers:  
 `-u`
 
-`&&score_del :user: :amount: <modifier>`  
+`+scoreAdd :user: :amount: <modifier>`  
 Removes `:amount:` from the score of `:user:`.  
 Valid modifiers:  
 `-u`
 
-`&&score_get :user: <modifier>`  
+`+scoreGet :user: <modifier>`  
 -OR-  
-`&&score_get --all`  
+`+scoreGet --all`  
 Returns the score of `:user:`.  
 The second option (`--all`) displays all scores.  
 Valid modifiers:  
@@ -63,12 +63,12 @@ Valid modifiers:
 
 ### Userbase
 
-`&&user_register :user: <modifier>`  
+`+registerUser :user: <modifier>`  
 Adds `:user:` into the userbase.  
 Valid modifiers:  
 `-u`
 
-`&&alias_add :user: :alias: <modifier>`
+`+aliasAdd :user: :alias: <modifier>`
 Assigns `:alias:` to `:user:`, allowing `:user:` to be referred by `:alias:` in other commands.  
 Example:
 
@@ -78,5 +78,5 @@ Example:
 + `&&score_get barfoo`
 + This will obtain the score of `foobar`, since It knows that `barfoo` is just referring to `foobar`.
 
-`&&alias_remove :alias:`  
+`+aliasRemove :alias:`  
 Removes `:alias:` from the user it was assigned to.
