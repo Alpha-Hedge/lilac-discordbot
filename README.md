@@ -7,7 +7,7 @@ A discord bot for the dogspotter discord server
 
 ### Syntax
 
-`&&` = Command prefix
+`+` = Command prefix
 
 `::` = Required argument
 
