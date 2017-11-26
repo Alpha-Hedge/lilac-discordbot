@@ -72,10 +72,10 @@ Valid modifiers:
 Assigns `:alias:` to `:user:`, allowing `:user:` to be referred by `:alias:` in other commands.  
 Example:
 
-+ `&&score_get barfoo`
++ `+scoreGet foobar`
 + This results in the user not being found. However...
-+ `&&alias_add barfoo foobar`
-+ `&&score_get barfoo`
++ `+aliasAdd foobar barfoo`
++ `+scoreGet foobar`
 + This will obtain the score of `foobar`, since It knows that `barfoo` is just referring to `foobar`.
 
 `+aliasRemove :alias:`  
