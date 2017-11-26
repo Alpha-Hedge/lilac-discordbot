@@ -5,6 +5,11 @@ A discord bot for the dogspotter discord server
 
 ## Help Documentation
 
+### General Notes
+
+1. Lilac's commands and arguments are **case sensitive!** Please keep this in mind while using the bot.  
+2. Lilac's commands **do not support spaces in arguments**. If you require the argument to have a space (e.g "Foo Bar"), please substitute spaces for underscores and use the `-u` modifier at the end of the command. (See: [Command Modifiers](https://github.com/Alpha-Hedge/lilac-discordbot#command-modifiers))
+
 ### Syntax
 
 `+` = Command prefix
