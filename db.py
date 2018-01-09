@@ -1,13 +1,18 @@
 print('db.py: Importing datetime...')
 import datetime
+print('Done. 1/5')
 print('db.py: Importing time...')
 import time
+print('Done. 2/5')
 print('db.py: Importing pyrebase...')
 import pyrebase
+print('Done. 3/5')
 print('db.py: Importing discord...')
 import discord
+print('Done. 4/5')
 print('db.py: Getting config from fbconf.py...')
 from CONF_fb import config
+print('Done. 5/5')
 
 firebase = pyrebase.initialize_app(config)
 

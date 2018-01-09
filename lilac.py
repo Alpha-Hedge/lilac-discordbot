@@ -1,25 +1,30 @@
 # IMPORTS
 print('lilac.py: Importing time...')
-print('Module 1/5')
 import time
+print('Done. 1/8')
 print('RUN DATE: '+time.strftime("%m/%d/%Y")+' '+time.strftime("%H:%M"))
 print('lilac.py: Importing random...')
-print('Module 2/5')
 import random
+print('Done. 2/8')
 print('lilac.py: Importing asyncio...')
-print('Module 3/5')
 import asyncio
+print('Done. 3/8')
 print('lilac.py: Importing discord...')
-print('Module 4/5')
 import discord
+print('Done. 4/8')
 print('lilac.py: Importing threading...')
-print('Module 5/5')
 import threading
+print('Done. 5/8')
 from discord.ext import commands
 print('lilac.py: Importing db.py...')
 import db
+print('Done. 6/8')
 print('lilac.py: Getting client token...')
 from CONF_bot import token
+print('Done. 7/8')
+print('lilac.py: Getting server ID...')
+from CONF_servid import servid
+print('Done. 8/8')
 
 client = discord.Client()
 
@@ -39,40 +44,20 @@ cmnds_database = [bot_pref+'score_add', bot_pref+'score_del', bot_pref+'score_ge
 categories = ['info', 'testing', 'database']
 
 spottedEmojis = [
-	'<:SpottedOrange:342831895257808908>', 
-	'<:SpottedRed:342831895140237312>', 
-	'<:SpottedGreen:342831896574558208>', 
-	'<:SpottedGreen:342831896574558208>', 
-	'<:SpottedBlue:342831896725815296>', 
-	'<:SpottedIndigo:342832174455586828>', 
-	'<:SpottedYellow:342831895978967040>', 
-	'<:SpottedPurple:342832217271173121>'
+	'<:SpottedOrange:%s>' % (servid), 
+	'<:SpottedRed:%s>' % (servid), 
+	'<:SpottedGreen:%s>' % (servid), 
+	'<:SpottedGreen:%s>' % (servid), 
+	'<:SpottedBlue:%s>' % (servid), 
+	'<:SpottedIndigo:%s>' % (servid), 
+	'<:SpottedYellow:%s>' % (servid), 
+	'<:SpottedPurple:%s>' % (servid)
 ]
-
-help_info = {
-	bot_pref+'help': bot_pref+'help [category] [command]\nGets a help topic on [command] in [category].',
-	bot_pref+'categories': bot_pref+'categories\nLists the current command categories.',
-	bot_pref+'version': bot_pref+'version\nGets the current version of Lilac (this bot).',
-	bot_pref+'developer': bot_pref+'developer\nGets the name of the Lilac (this bot) developer',
-	bot_pref+'commands': bot_pref+'commands [category]\nGets a list of commands in [category].'
-}
-
-help_testing = {
-	bot_pref+'bugreport': bot_pref+'bugreport [message]\nSends a message to the developer.',
-	bot_pref+'hello': bot_pref+'hello\nSimple test command.'
-}
-
-help_database = {
-	bot_pref+'score_add': bot_pref+'score_add [user] [amount]\nAdds [amount] of points to [user].',
-	bot_pref+'score_del': bot_pref+'score_del [user] [amount]\nRemoves [amount] of points from [user].',
-	bot_pref+'score_get': bot_pref+'score_get [user]\nGets the current score of [user].',
-	bot_pref+'score_reset': bot_pref+'score_reset [user]\nResets the score of [user] to 0. **Use with caution.**'
-}
 
 def create_role_dict():
 	global role_dict
 	role_dict = {}
-	for i in client.get_server('342825738350886913').roles:
+	for i in client.get_server(servid).roles:
 		role_dict[i.name] = i
 
 	print('Roles:')
@@ -82,7 +67,7 @@ def create_role_dict():
 def create_emoji_dict():
 	global emoji_dict
 	emoji_dict = {}
-	for i in client.get_server('342825738350886913').emojis:
+	for i in client.get_server(servid).emojis:
 		emoji_dict[i.name] = i
 
 	print('Emojis:')
@@ -102,21 +87,6 @@ def get_role(server_roles, target_name):
 		if each.name == target_name:
 			return each
 	return None
-
-
-def qCheck(li): # Only still here in case something else uses it
-	for i in range(len(li)):
-		if li[i].startswith('"'):
-			join_start = i
-		if li[i].endswith('"'):
-			join_end = i
-		i+=1
-
-	joined = []
-	for i in range(join_start, (join_end)+1):
-		joined.append(li[i])
-
-	return ' '.join(joined).replace('"','')
 
 
 def findInt(li):
@@ -163,8 +133,8 @@ def on_message(message):
 
 	# DEV-ONLY COMMANDS
 	# These commands can only be used by someone with the 'lilac developer' role; in the case of debugging or beta commands/features
-	if role_dict['lilac developer'] in message.author.roles:
-		pass
+	# if role_dict['lilac developer'] in message.author.roles:
+	# 	pass
 
 	# Category: Roles
 	if message.content.startswith(bot_pref+'color'):
@@ -332,9 +302,23 @@ def on_message(message):
 	if message.content.startswith(bot_pref+'modForm'):
 		yield from client.send_message(message.channel, 'Please visit this link: https://goo.gl/forms/EhFTThutYoL6wfxQ2\nModerator applications are open 24/7, unless specified by staff.')
 
+	# Misc Math Functions
+	if message.content.startswith(bot_pref+'math.FtoP'):
+		msg_split = message.content.split()
+		f = msg_split[1].split('/')
+		p = int(f[0]) / int(f[1])
+		p*=100
+		yield from client.send_message(message.channel, msg_split[1] + ' is equal to ' + str(p) + '%')
+
+	if message.content.startswith(bot_pref+'math.FtoD'):
+		msg_split = message.content.split()
+		f = msg_split[1].split('/')
+		d = int(f[0]) / int(f[1])
+		yield from client.send_message(message.channel, msg_split[1] + ' is equal to ' + str(d))
+
 	# Category: Misc; Sub-Category: Jokes/Memes
 	# Category: Misc; Sub-Category: Jokes/Memes; Sub-Category: Videos
-	if message.content.startswith('&&video'):
+	if message.content.startswith('+video'):
 		if message.content.endswith('ascend'):
 			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=vGyHXW0lwZY')
 		if message.content.endswith('inthewoods'):
@@ -351,7 +335,7 @@ def on_message(message):
 			yield from client.send_message(message.channel, 'https://www.youtube.com/watch?v=PVHxztbT71o')
 	
 	# Category: Misc; Sub-Category: Jokes/Memes; Sub-Category: Images
-	if message.content.startswith('&&image'):
+	if message.content.startswith('+image'):
 		if message.content.endswith('praisebagman'):
 			yield from client.send_message(message.channel, 'https://cdn.discordapp.com/attachments/342835715236954115/346359947908612096/bagmanHOLY.png')
 		if message.content.endswith('wheezd'):
@@ -374,13 +358,6 @@ def on_message(message):
 
 	if message.content.startswith(bot_pref+'role-list'):
 		print(message.author.roles)
-
-	# if message.content.startswith(bot_pref+'bugreport'):
-	# 	msg_split = message.content.split()
-	# 	rmsg = qCheck(msg_split)
-
-	# 	yield from client.send_message(developer, str(message.author)+' has sent a bug report: '+rmsg)
-	# 	yield from client.send_message(message.channel, 'Your bug report has been sent to the developer.')
 
 	if message.content.startswith(bot_pref+'hello'):
 		yield from client.send_message(message.channel, 'Hi! :D')
