@@ -85,3 +85,15 @@ Example:
 
 `+aliasRemove :alias:`  
 Removes `:alias:` from the user it was assigned to.
+
+---
+
+### Miscellaneous Functions
+
+### Math
+
+`+math.FtoP :fraction:` - **F**raction **to** **P**ercentage  
+Converts :fraction: to a percentage (fraction format: x/y; e.g 1/2)
+
+`+math.FtoD :decimal:` - **F**raction **to** **D**ecimal
+Converts :fraction: to a decimal (float) number (fraction format: x/y; e.g 1/2)
