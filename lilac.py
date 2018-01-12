@@ -44,14 +44,14 @@ cmnds_database = [bot_pref+'score_add', bot_pref+'score_del', bot_pref+'score_ge
 categories = ['info', 'testing', 'database']
 
 spottedEmojis = [
-	'<:SpottedOrange:%s>' % (servid), 
-	'<:SpottedRed:%s>' % (servid), 
-	'<:SpottedGreen:%s>' % (servid), 
-	'<:SpottedGreen:%s>' % (servid), 
-	'<:SpottedBlue:%s>' % (servid), 
-	'<:SpottedIndigo:%s>' % (servid), 
-	'<:SpottedYellow:%s>' % (servid), 
-	'<:SpottedPurple:%s>' % (servid)
+	'<:SpottedOrange:%s>' % (int(servid)), 
+	'<:SpottedRed:%s>' % (int(servid)), 
+	'<:SpottedGreen:%s>' % (int(servid)), 
+	'<:SpottedGreen:%s>' % (int(servid)), 
+	'<:SpottedBlue:%s>' % (int(servid)), 
+	'<:SpottedIndigo:%s>' % (int(servid)), 
+	'<:SpottedYellow:%s>' % (int(servid)), 
+	'<:SpottedPurple:%s>' % (int(servid))
 ]
 
 def create_role_dict():
