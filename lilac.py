@@ -29,7 +29,7 @@ print('Done. 8/8')
 client = discord.Client()
 
 bot_pref = '+'
-bot_version = '1.1.0'
+bot_version = '1.1.12'
 
 def getDate():
 	return time.strftime("%m/%d/%Y")
@@ -37,24 +37,8 @@ def getDate():
 def getTime():
 	return time.strftime("%H:%M")
 
-cmnds_info = [bot_pref+'commands', bot_pref+'help', bot_pref+'version', bot_pref+'developer']
-cmnds_testing = [bot_pref+'bugreport', bot_pref+'hello', bot_pref+'args']
-cmnds_database = [bot_pref+'score_add', bot_pref+'score_del', bot_pref+'score_get', bot_pref+'score_reset', bot_pref+'latest_doggo_update_URL', bot_pref+'latest_doggo_get_URL']
-
-categories = ['info', 'testing', 'database']
-
-spottedEmojis = [
-	'<:SpottedOrange:%s>' % (int(servid)), 
-	'<:SpottedRed:%s>' % (int(servid)), 
-	'<:SpottedGreen:%s>' % (int(servid)), 
-	'<:SpottedGreen:%s>' % (int(servid)), 
-	'<:SpottedBlue:%s>' % (int(servid)), 
-	'<:SpottedIndigo:%s>' % (int(servid)), 
-	'<:SpottedYellow:%s>' % (int(servid)), 
-	'<:SpottedPurple:%s>' % (int(servid))
-]
-
 def create_role_dict():
+	print('Setting up the role dictionary...')
 	global role_dict
 	role_dict = {}
 	for i in client.get_server(servid).roles:
@@ -65,6 +49,7 @@ def create_role_dict():
 
 
 def create_emoji_dict():
+	print('Setting up the emoji dictionary...')
 	global emoji_dict
 	emoji_dict = {}
 	for i in client.get_server(servid).emojis:
@@ -74,7 +59,19 @@ def create_emoji_dict():
 	print(emoji_dict)
 
 
+spottedEmojis = [
+	'<:SpottedGreen:342831896574558208>',
+	'<:SpottedOrange:342831895257808908>',
+	'<:SpottedPurple:342832217271173121>',
+	'<:SpottedRed:342831895140237312>',
+	'<:SpottedYellow:342831895978967040>',
+	'<:SpottedDarkBlue:342832174455586828>',
+	'<:SpottedBlue:342831896725815296>'
+]
+
+
 def create_member_list():
+	print('Setting up the member list...')
 	global member_list
 	member_list = []
 	for i in client.get_all_members():
@@ -125,7 +122,7 @@ def on_ready():
 def on_message(message):
 	developer = message.server.get_member_named('Alphys Hedge#1031')
 	# comment this out to toggle logging
-	# print(message.content)
+	print(message.content)
 
 	# So the bot won't respond to itself
 	if message.author == client.user:
